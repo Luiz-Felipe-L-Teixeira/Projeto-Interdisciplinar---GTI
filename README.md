@@ -5,3 +5,8 @@ O LocalizArt é uma aplicação Web projetada para otimizar o trabalho dos agent
 
 # Sobre o Projeto
 Muitos agentes culturais ainda realizam o mapeamento de seus territórios de forma manuscrita (papel e caneta), o que dificulta a análise de impacto e a continuidade das políticas públicas locais.
+
+## Nossa solução propõe:
+  * Centralização: Um único lugar para todos os registros
+  * Mobilidade: Foco em dispositivos móveis para que o agente registre a informação do artista local ou coletivo.
+  * 
