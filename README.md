@@ -9,4 +9,22 @@ Muitos agentes culturais ainda realizam o mapeamento de seus territórios de for
 ## Nossa solução propõe:
   * Centralização: Um único lugar para todos os registros
   * Mobilidade: Foco em dispositivos móveis para que o agente registre a informação do artista local ou coletivo.
-  * 
+  * Visibilidade: Facilitar a identificação de nichos artísticos (música, artes visuais, teatro) por região.
+
+# Funcionalidades Principais:
+* Cadastro de Artista/Coletivo: Formulário completo incluindo nome artístico, vertente, contato e breve portifólio.
+* Geolocalização: Registro do bairro ou zona de atuação para facilitar o mapeamento territorial.
+* Categorização: Filtros por linguagem artística (Artes Visuais, Música, Dança, etc).
+* Dashboard do Coordenador: Resumo numérico do total de cadastros realizados pelos agentes.
+
+# Tecnologias Utilizadas:
+* Front-End: HTML, CSS e JavaScript
+* Back-End: PHP
+* Banco de Dados: MySQL
+* Aplicação de Diagramação: LucidChart
+* Ambiente de Desenvolvimento: XAMPP
+* Versionamento: GitHub
+
+# Equipe
+Nome: Kauan Molodowski Ferreira | GitHub:  | LinkedIn: //www.linkedin.com/in/kauan-molodowski-6798b12b6/
+Nome: Luiz Felipe de Lima Teixeira | GitHub: https://github.com/Luiz-Felipe-L-Teixeira/ | LinkedIn: www.linkedin.com/in/luizfelipedelima
