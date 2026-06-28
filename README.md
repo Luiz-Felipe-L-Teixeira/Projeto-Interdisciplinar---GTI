@@ -21,6 +21,7 @@ Muitos agentes culturais ainda realizam o mapeamento de seus territórios de for
 * Front-End: HTML, CSS e JavaScript
 * Back-End: PHP
 * Banco de Dados: MySQL
+* IDE: VsCode
 * Aplicação de Diagramação: LucidChart
 * Ambiente de Desenvolvimento: XAMPP
 * Versionamento: GitHub
