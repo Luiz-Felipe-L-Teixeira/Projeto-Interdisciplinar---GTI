@@ -27,4 +27,5 @@ Muitos agentes culturais ainda realizam o mapeamento de seus territórios de for
 
 # Equipe
 Nome: Kauan Molodowski Ferreira | GitHub:  | LinkedIn: //www.linkedin.com/in/kauan-molodowski-6798b12b6/
+
 Nome: Luiz Felipe de Lima Teixeira | GitHub: https://github.com/Luiz-Felipe-L-Teixeira/ | LinkedIn: www.linkedin.com/in/luizfelipedelima
