@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Mapeamento Cultural Pinhais</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="login-section">
+        <div class="login-container">
+            <div class="login-box">
+                <div class="toggle-container">
+                    <button type="button" class="toggle-btn active" id="btn-agente" onclick="mudarLogin('agente')">Agente</button>
+                    <button type="button" class="toggle-btn" id="btn-coord" onclick="mudarLogin('coordenador')">Coordenador</button>
+                </div>
+
+                <div class="logo-icon">📍</div>
+                <h2 id="titulo-login">Acesso do Agente</h2>
+                <p id="subtitulo-login">Mapeamento Cultural de Pinhais</p>
+                
+                <form action="login.php" method="POST">
+                    <input type="hidden" id="tipo_usuario" name="tipo_usuario" value="agente">
+                    <div class="input-group">
+                        <label>E-mail</label>
+                        <input type="email" name="email" required placeholder="Digite seu e-mail">
+                    </div>
+                    <div class="input-group">
+                        <label>Senha</label>
+                        <input type="password" name="senha" required placeholder="Digite sua senha">
+                    </div>
+                    <button type="submit" class="btn-login" id="btn-submit">Entrar no Sistema</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="map-section">
+        <div id="map-background"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        const latPinhais = -25.4422;
+        const lonPinhais = -49.1928;
+
+        const map = L.map('map-background', {
+            zoomControl: true, 
+            dragging: true, 
+            scrollWheelZoom: true, 
+            attributionControl: false 
+        }).setView([latPinhais, lonPinhais], 14); 
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        window.addEventListener('resize', () => {
+            map.invalidateSize();
+        });
+
+        setTimeout(() => { map.invalidateSize(); }, 500);
+
+        function mudarLogin(tipo) {
+            const btnAgente = document.getElementById('btn-agente');
+            const btnCoord = document.getElementById('btn-coord');
+            const titulo = document.getElementById('titulo-login');
+            const subtitulo = document.getElementById('subtitulo-login');
+            const inputTipo = document.getElementById('tipo_usuario');
+            const btnSubmit = document.getElementById('btn-submit');
+
+            if (tipo === 'agente') {
+                btnAgente.classList.add('active');
+                btnCoord.classList.remove('active');
+                titulo.innerText = 'Acesso do Agente';
+                subtitulo.innerText = 'Mapeamento Cultural de Pinhais';
+                inputTipo.value = 'agente';
+            } else {
+                btnCoord.classList.add('active');
+                btnAgente.classList.remove('active');
+                titulo.innerText = 'Painel da Coordenação';
+                subtitulo.innerText = 'Gerencie a cultura do município';
+                inputTipo.value = 'coordenador';
+            }
+        }
+    </script>
+</body>
+</html>

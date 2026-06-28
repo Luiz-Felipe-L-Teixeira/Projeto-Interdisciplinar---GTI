@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Agente - Mapeamento Cultural</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="agente.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fa-solid fa-map-location-dot" style="color: #a87ffb; margin-right: 8px;"></i> Mapeamento</h2>
+                <p>Agente em Campo: Pinhais</p>
+            </div>
+
+            <form id="form-cadastro" action="salvar_artista.php" method="POST" enctype="multipart/form-data">
+                
+                <div class="input-group">
+                    <label>Nome do Artista/Grupo Cultural</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-masks-theater"></i>
+                        <input type="text" name="nome_grupo" required placeholder="Ex: Cia. de Teatro Luzes">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Categoria Artística</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-palette"></i>
+                        <select name="categoria" required>
+                            <option value="">Selecione uma categoria...</option>
+                            <option value="Musica">Música</option>
+                            <option value="Teatro">Teatro</option>
+                            <option value="Danca">Dança</option>
+                            <option value="ArtesPlasticas">Artes Plásticas</option>
+                            <option value="Literatura">Literatura</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Bairro</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-tree-city"></i>
+                        <input type="text" name="bairro" required placeholder="Bairro de atuação">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Bloco de Anotações</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-book-open icon-textarea"></i>
+                        <textarea name="observacoes" rows="3" placeholder="Informações extras, telefone, redes sociais..."></textarea>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Foto do Local ou Artista</label>
+                    <label for="foto-upload" class="file-upload-btn">
+                        <i class="fa-solid fa-camera"></i> <span id="foto-texto">Tirar foto ou anexar</span>
+                    </label>
+                    <input type="file" id="foto-upload" name="foto" accept="image/*" capture="environment" style="display: none;">
+                    
+                    <div id="foto-preview" class="preview-box" style="display: none;">
+                        <img id="preview-img" src="">
+                    </div>
+                </div>
+
+                <input type="hidden" id="latitude" name="latitude">
+                <input type="hidden" id="longitude" name="longitude">
+
+                <div class="map-instruction">
+                    <button type="button" id="btn-gps" class="btn-gps">
+                        <i class="fa-solid fa-location-crosshairs"></i> Usar meu GPS
+                    </button>
+                    <div class="instruction-header">
+                        <i class="fa-solid fa-hand-pointer"></i>
+                        <span>Ou toque no mapa para marcar o local.</span>
+                    </div>
+                    <div class="instruction-status" id="coordenadas-texto">
+                        Aguardando localização...
+                    </div>
+                    
+                    <button type="button" id="btn-limpar-pino" class="btn-gps" style="display: none; border-color: #f75a68; color: #f75a68; margin-top: 10px;">
+                        <i class="fa-solid fa-trash-can"></i> Remover Marcador
+                    </button>
+                </div>
+
+                <button type="submit" class="btn-registrar">
+                    <i class="fa-solid fa-floppy-disk"></i> Salvar Mapeamento
+                </button>
+            </form>
+
+            <div class="sidebar-footer">
+                <p>Sessão ativa | Pinhais Cultural</p>
+                <a href="index.html" class="btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair do Sistema</a>
+            </div>
+        </aside>
+
+        <main class="map-area">
+            <div id="mapa-agente"></div>
+        </main>
+
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('mapa-agente').setView([-25.4422, -49.1928], 14);
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+        // Ícones
+        const pinoPremium = L.divIcon({ className: 'pino-customizado', html: '<div class="ponto-roxo"></div><div class="pulso"></div>', iconSize: [24, 24], iconAnchor: [12, 12], popupAnchor: [0, -15] });
+        const pinoSalvo = L.divIcon({ className: 'pino-salvo', html: '<div style="width:16px; height:16px; background:#00b37e; border:2px solid #fff; border-radius:50%; box-shadow:0 2px 5px rgba(0,0,0,0.5);"></div>', iconSize: [16, 16], iconAnchor: [8, 8], popupAnchor: [0, -10] });
+
+        // --- NOVA LÓGICA: CARREGAR TODOS OS PONTOS DO BANCO (UNIVERSAL) ---
+        function carregarPontosUniversais() {
+    fetch('buscar_artistas.php')
+        .then(response => response.json())
+        .then(artistas => {
+
+            console.log("Artistas carregados:", artistas);
+
+            artistas.forEach(local => {
+
+                const lat = parseFloat(local.latitude);
+                const lng = parseFloat(local.longitude);
+
+                if (isNaN(lat) || isNaN(lng)) {
+                    console.log("Coordenadas inválidas:", local);
+                    return;
+                }
+
+                let popupHTML = `
+                    <div style="font-family:Poppins; text-align:center;">
+                        <b>${local.nome_grupo}</b><br>
+                        <small style="color:#667eea;">${local.categoria}</small><br>
+                        <small style="color:#00b37e;">✔ Mapeado pela Equipe</small>
+                    </div>
+                `;
+
+                L.marker([lat, lng], { icon: pinoSalvo })
+                    .addTo(map)
+                    .bindPopup(popupHTML);
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar mapa universal:', error);
+        });
+}
+
+        // Chama a função assim que a página abre
+        carregarPontosUniversais();
+
+        // --- RESTO DA LÓGICA (CLIQUE, GPS, FOTO) ---
+        let marcadorAtual = null;
+
+        function marcarNoMapa(lat, lng) {
+            if (marcadorAtual) map.removeLayer(marcadorAtual);
+            marcadorAtual = L.marker([lat, lng], {icon: pinoPremium}).addTo(map);
+            marcadorAtual.bindPopup("<div style='text-align:center; font-family:Poppins;'><b>Confirmar Local?</b></div>").openPopup();
+
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+
+            const textoAviso = document.getElementById('coordenadas-texto');
+            textoAviso.innerHTML = `<i class="fa-solid fa-check"></i> Local capturado!<br>Lat: ${lat.toFixed(4)} | Lng: ${lng.toFixed(4)}`;
+            textoAviso.classList.add('sucesso');
+            document.getElementById('btn-limpar-pino').style.display = 'flex';
+        }
+
+        map.on('click', function(e) { marcarNoMapa(e.latlng.lat, e.latlng.lng); });
+
+        document.getElementById('btn-limpar-pino').addEventListener('click', function() {
+            if (marcadorAtual) map.removeLayer(marcadorAtual);
+            marcadorAtual = null;
+            document.getElementById('latitude').value = '';
+            document.getElementById('longitude').value = '';
+            const textoAviso = document.getElementById('coordenadas-texto');
+            textoAviso.innerHTML = 'Aguardando localização...';
+            textoAviso.classList.remove('sucesso');
+            this.style.display = 'none';
+        });
+
+        // GPS e FOTO (códigos anteriores mantidos...)
+        document.getElementById('btn-gps').addEventListener('click', function() {
+            const btn = this;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Buscando GPS...';
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    map.setView([lat, lng], 17); 
+                    marcarNoMapa(lat, lng);
+                    btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Usar meu GPS';
+                }, function() {
+                    alert("Ative o GPS.");
+                    btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Usar meu GPS';
+                });
+            }
+        });
+
+        document.getElementById('foto-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                document.getElementById('foto-texto').innerText = file.name.substring(0,15)+'...';
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('foto-preview').style.display = 'block';
+                    document.getElementById('preview-img').src = event.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>

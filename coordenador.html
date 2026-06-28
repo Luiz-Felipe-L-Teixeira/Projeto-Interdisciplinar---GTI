@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Coordenador - Gestão Cultural</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="coordenador.css">
+</head>
+<body>
+
+    <div class="admin-container">
+        <aside class="admin-sidebar">
+            <div class="admin-header">
+                <h2><i class="fa-solid fa-tower-observation"></i> Painel Gestor</h2>
+                <p>Pinhais Cultural - Monitoramento</p>
+            </div>
+
+            <div class="admin-actions">
+                <button class="btn-novo-usuario" onclick="abrirModal()">
+                    <i class="fa-solid fa-user-plus"></i> Cadastrar Novo Agente
+                </button>
+            </div>
+
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="filtro" placeholder="Buscar artista ou bairro...">
+            </div>
+
+            <div class="list-section">
+                <h3><i class="fa-solid fa-users-gear"></i> Lista de Cadastros</h3>
+                <div class="artistas-list" id="lista-artistas">
+                    </div>
+            </div>
+
+            <div class="admin-footer">
+                <a href="index.html" class="btn-logout">
+                    <i class="fa-solid fa-power-off"></i> Sair do Sistema
+                </a>
+            </div>
+        </aside>
+
+        <main class="admin-map-area">
+            <div id="mapa-geral"></div>
+            
+            <div class="map-legend">
+                <div><span class="dot roxo"></span> Grupo Cultural</div>
+                <div><span class="dot verde"></span> Agente Online</div>
+            </div>
+        </main>
+    </div>
+
+    <div id="modalUsuario" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Cadastrar Novo Acesso</h3>
+                <button onclick="fecharModal()" class="close-btn">&times;</button>
+            </div>
+            <form action="criar_usuario.php" method="POST">
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" name="nome" required placeholder="Ex: João Silva">
+                </div>
+                <div class="form-group">
+                    <label>E-mail (Login)</label>
+                    <input type="email" name="email" required placeholder="agente@pinhais.com">
+                </div>
+                <div class="form-group">
+                    <label>Senha Provisória</label>
+                    <input type="password" name="senha" required>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Acesso</label>
+                    <select name="tipo">
+                        <option value="agente">Agente de Campo</option>
+                        <option value="coordenador">Coordenador/Gestor</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn-confirmar">Criar Usuário</button>
+                    <button type="button" onclick="fecharModal()" class="btn-cancelar">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inicia o mapa
+        const map = L.map('mapa-geral').setView([-25.4422, -49.1928], 13);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // Ícones
+        const iconeCultura = L.divIcon({ 
+            className: 'pino-cultura', 
+            html: '<div style="background:#8257e5; width:12px; height:12px; border:2px solid white; border-radius:50%; box-shadow: 0 0 5px rgba(0,0,0,0.3);"></div>' 
+        });
+
+        // Funções do Modal
+        function abrirModal() { document.getElementById('modalUsuario').style.display = 'flex'; }
+        function fecharModal() { document.getElementById('modalUsuario').style.display = 'none'; }
+
+        // Carregar Artistas e Agentes (Logica de busca universal)
+        fetch('buscar_artistas.php')
+            .then(res => res.json())
+            .then(data => {
+                const lista = document.getElementById('lista-artistas');
+                lista.innerHTML = '';
+                data.forEach(a => {
+                    // Marcador no mapa
+                    L.marker([a.latitude, a.longitude], {icon: iconeCultura})
+                     .addTo(map)
+                     .bindPopup(`<b>${a.nome_grupo}</b><br>${a.bairro}`);
+
+                    // Item na lista lateral
+                    const item = document.createElement('div');
+                    item.className = 'artista-item';
+                    item.innerHTML = `<strong>${a.nome_grupo}</strong><span>${a.bairro}</span>`;
+                    item.onclick = () => map.setView([a.latitude, a.longitude], 17);
+                    lista.appendChild(item);
+                });
+            });
+    </script>
+</body>
+</html>
