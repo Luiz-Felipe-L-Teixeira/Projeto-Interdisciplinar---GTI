@@ -27,6 +27,8 @@ Muitos agentes culturais ainda realizam o mapeamento de seus territórios de for
 * Versionamento: GitHub
 
 # Equipe
-Nome: Kauan Molodowski Ferreira | GitHub:  | LinkedIn: //www.linkedin.com/in/kauan-molodowski-6798b12b6/
+**Nome**: Kauan Molodowski Ferreira | GitHub:  | LinkedIn: //www.linkedin.com/in/kauan-molodowski-6798b12b6/
 
-Nome: Luiz Felipe de Lima Teixeira | GitHub: https://github.com/Luiz-Felipe-L-Teixeira/ | LinkedIn: www.linkedin.com/in/luizfelipedelima
+**Nome**: Luiz Felipe de Lima Teixeira | GitHub: https://github.com/Luiz-Felipe-L-Teixeira/ | LinkedIn: www.linkedin.com/in/luizfelipedelima
+
+* **Nota Acadêmica**: Este projeto faz parte dos requisitos para aprovação na matéria de Projeto Interdisciplinar do curso de Gestão da Tecnologia da Informação no Instituto Federal do Paraná.
